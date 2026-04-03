@@ -3,14 +3,19 @@ package com.whernandez.dreamshops.service.product;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.whernandez.dreamshops.dto.AddProductDto;
+import com.whernandez.dreamshops.dto.ImageDto;
+import com.whernandez.dreamshops.dto.ProductDto;
 import com.whernandez.dreamshops.dto.UpdateProductDto;
 import com.whernandez.dreamshops.exceptions.ProductNotFoundException;
 import com.whernandez.dreamshops.model.Category;
+import com.whernandez.dreamshops.model.Image;
 import com.whernandez.dreamshops.model.Product;
 import com.whernandez.dreamshops.repository.CategoryRepository;
+import com.whernandez.dreamshops.repository.ImageRepository;
 import com.whernandez.dreamshops.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +26,8 @@ public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
+    private final ImageRepository imageRepository;
 
     @Override
     public Product addProduct(AddProductDto product) {
@@ -118,6 +125,23 @@ public class ProductService implements IProductService {
     @Override
     public Long countProductsByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndName(brand, name);
+    }
+
+    @Override
+    public List<ProductDto> getConvertedProducts(List<Product> products) {
+        return products.stream().map(this::convertToDto).toList();
+    }
+
+    @Override
+    public ProductDto convertToDto(Product product) {
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
+        List<Image> images = imageRepository.findByProductId(product.getId());
+        List<ImageDto> imagesDtos = images.stream()
+            .map(image -> modelMapper.map(image, ImageDto.class))
+            .toList();
+
+        productDto.setImages(imagesDtos);
+        return productDto;
     }
 
 }

@@ -3,6 +3,7 @@ package com.whernandez.dreamshops.service.product;
 import java.util.List;
 
 import com.whernandez.dreamshops.dto.AddProductDto;
+import com.whernandez.dreamshops.dto.ProductDto;
 import com.whernandez.dreamshops.dto.UpdateProductDto;
 import com.whernandez.dreamshops.model.Product;
 
@@ -30,6 +31,8 @@ public interface IProductService {
 
     Long countProductsByBrandAndName(String brand, String name);
 
+    ProductDto convertToDto(Product product);
 
+    List<ProductDto> getConvertedProducts(List<Product> products);
 
 }
